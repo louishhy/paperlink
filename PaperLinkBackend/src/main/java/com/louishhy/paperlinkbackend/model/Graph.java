@@ -32,6 +32,4 @@ public class Graph {
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     private Instant updatedAt;
-
-    @OneToMany(mappedBy = "graph", )
 }
