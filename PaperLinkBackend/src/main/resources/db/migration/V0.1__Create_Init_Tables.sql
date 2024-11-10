@@ -13,6 +13,7 @@ CREATE TABLE account (
 CREATE TABLE paper (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(500) NOT NULL,
+    authors VARCHAR(500) NOT NULL,
     doi VARCHAR(255) NOT NULL UNIQUE,
     paper_abstract TEXT NOT NULL,
     publication VARCHAR(255) NOT NULL,
