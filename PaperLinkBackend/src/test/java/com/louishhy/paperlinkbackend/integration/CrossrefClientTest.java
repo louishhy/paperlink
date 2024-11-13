@@ -12,7 +12,6 @@ import org.springframework.context.annotation.PropertySource;
 public class CrossrefClientTest {
     public static void main(String[] args) {
         CrossrefClient client = new CrossrefClient();
-        // 通过反射设置email字段
         try {
             java.lang.reflect.Field emailField = CrossrefClient.class.getDeclaredField("email");
             emailField.setAccessible(true);
