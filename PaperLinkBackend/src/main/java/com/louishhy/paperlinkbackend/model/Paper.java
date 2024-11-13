@@ -22,7 +22,7 @@ public class Paper {
     private String doi;
 
     @Column(name = "paper_abstract", nullable = false, columnDefinition = "TEXT")
-    private String paper_abstract;
+    private String paperAbstract;
 
     @Column(name = "publication", nullable = false, length = 255)
     private String publication;
