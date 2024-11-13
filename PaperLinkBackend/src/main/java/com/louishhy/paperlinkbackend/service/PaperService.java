@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.louishhy.paperlinkbackend.dto.crossref.CrossrefWork;
+import com.louishhy.paperlinkbackend.integration.CrossrefClient;
 import com.louishhy.paperlinkbackend.model.Paper;
 import com.louishhy.paperlinkbackend.repository.PaperRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -11,45 +12,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class PaperService {
     private final PaperRepository paperRepository;
-    private final WebClient crossrefClient;
+    private final CrossrefClient crossrefClient;
 
-    public PaperService(@Autowired PaperRepository paperRepository,
-                        @Qualifier("crossrefClient") WebClient crossrefClient) {
+    @Autowired
+    public PaperService(PaperRepository paperRepository,
+                        CrossrefClient crossrefClient) {
         this.paperRepository = paperRepository;
         this.crossrefClient = crossrefClient;
     }
-
-    public Mono<CrossrefWork> getCrossrefWorkByDoi(String doi) {
-        return crossrefClient.get()
-                .uri("/works/{doi}", doi)
-                .retrieve()
-                .bodyToMono(JsonNode.class)
-                .map(root -> root.get("message"))
-                .flatMap(message -> {
-                    try {
-                        return Mono.just(new ObjectMapper().treeToValue(message, CrossrefWork.class));
-                    } catch (JsonProcessingException e) {
-                        return Mono.error(e);
-                    }
-                })
-                .doOnError(error -> log.error("Error getting Crossref work by DOI {}: {}", doi, error.getMessage()));
-    }
-
 
     public List<Paper> getAllPapers() {
         return paperRepository.findAll();
     }
 
+    public Paper addPaperByDoi(String doi) {
+        CrossrefWork crossrefWork = this.crossrefClient.getWorkByDoi(doi);
+        Paper paper = new Paper();
+        // Special processing for saving items
+        String authorsStr = crossrefWork.getAuthor().stream()
+                .map(a -> a.getFamily() + " " + a.getGiven())
+                .collect(Collectors.joining(", "));
+        String paperTitle = crossrefWork.getTitle().get(0);
+        String containerTitle = crossrefWork.getContainerTitle().get(0);
+        paper.setDoi(crossrefWork.getDoi());
+        paper.setTitle(paperTitle);
+        paper.setAuthors(authorsStr);
+        paper.setPublication(containerTitle);
+        paper.setPaperAbstract(crossrefWork.getAbstract_());
+        paper.setUrl(crossrefWork.getUrl());
+        // Persist paper
+        return paperRepository.save(paper);
+    }
 
     public void deletePaper(long id) {
         paperRepository.deleteById(id);

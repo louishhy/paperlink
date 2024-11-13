@@ -1,0 +1,2 @@
+ALTER TABLE paper
+MODIFY COLUMN paper_abstract TEXT NULL;

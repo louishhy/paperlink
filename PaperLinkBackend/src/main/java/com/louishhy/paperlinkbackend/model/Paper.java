@@ -18,10 +18,10 @@ public class Paper {
     @Column(name = "authors", nullable = false, length = 500)
     private String authors;
 
-    @Column(name = "doi", nullable = false, length = 255)
+    @Column(name = "doi", nullable = false, length = 255, unique = true)
     private String doi;
 
-    @Column(name = "paper_abstract", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "paper_abstract", columnDefinition = "TEXT")
     private String paperAbstract;
 
     @Column(name = "publication", nullable = false, length = 255)
