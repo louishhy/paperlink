@@ -1,5 +1,7 @@
 package com.louishhy.paperlinkbackend.config;
 
+import com.louishhy.paperlinkbackend.security.JwtRequestFilter;
+import com.louishhy.paperlinkbackend.service.CustomUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +18,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private final JwtRequestFilter jwtRequestFilter;
+    private final CustomUserDetailService customUserDetailService;
 
     @Autowired
-    private JwtRequestFilter jwtRequestFilter;
+    public SecurityConfig(JwtRequestFilter jwtRequestFilter, CustomUserDetailService customUserDetailService) {
+        this.jwtRequestFilter = jwtRequestFilter;
+        this.customUserDetailService = customUserDetailService;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -30,6 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(("/api/auth/**")).permitAll() // Permit all requests to /api/auth/**
                         .anyRequest().authenticated())
+                .userDetailsService(customUserDetailService)
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
