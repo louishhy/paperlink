@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(("/api/auth/**")).permitAll() // Permit all requests to /api/auth/**
                         .requestMatchers(("/error")).permitAll() // Permit all requests to /error
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/swagger-ui.html").permitAll() // Permit all requests to Swagger UI
                         .anyRequest().authenticated())
                 .userDetailsService(customUserDetailService)
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
