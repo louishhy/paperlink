@@ -4,6 +4,7 @@ import com.louishhy.paperlinkbackend.exception.crossref.CrossrefNotFoundExceptio
 import com.louishhy.paperlinkbackend.model.Paper;
 import com.louishhy.paperlinkbackend.service.PaperService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,5 +37,10 @@ public class PaperController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePaper(@PathVariable Long id) {
+        paperService.deletePaper(id);
+        return ResponseEntity.noContent().build();
+    }
 
 }
