@@ -8,31 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class GraphDTO {
+public class SimplifiedGraphDTO {
     private Long graphId;
     private Long createdUserId;
     private String graphName;
     private String graphDescription;
     private Instant createdAt;
     private Instant updatedAt;
-    // Nodes and edges
-    private List<GraphNodeDTO> nodes = new ArrayList<>();
-    private List<GraphEdgeDTO> edges = new ArrayList<>();
 
-    public static GraphDTO fromEntity(Graph graph) {
-        GraphDTO dto = new GraphDTO();
+    public static SimplifiedGraphDTO fromEntity(Graph graph) {
+        SimplifiedGraphDTO dto = new SimplifiedGraphDTO();
         dto.setGraphId(graph.getId());
         dto.setCreatedUserId(graph.getUserId());
         dto.setGraphName(graph.getName());
         dto.setGraphDescription(graph.getDescription());
         dto.setCreatedAt(graph.getCreatedAt());
         dto.setUpdatedAt(graph.getUpdatedAt());
-        dto.setNodes(graph.getNodes().stream()
-                .map(GraphNodeDTO::fromEntity)
-                .toList());
-        dto.setEdges(graph.getEdges().stream()
-                .map(GraphEdgeDTO::fromEntity)
-                .toList());
         return dto;
     }
 }

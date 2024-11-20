@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface GraphNodeRepository extends JpaRepository<GraphNode, Long> {
     List<GraphNode> findByGraphId(Long graphId);
+    boolean existsByGraphIdAndPaperId(Long graphId, Long paperId);
 }

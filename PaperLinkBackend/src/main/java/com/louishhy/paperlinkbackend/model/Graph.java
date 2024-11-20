@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "graph")
@@ -32,4 +33,16 @@ public class Graph {
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     private Instant updatedAt;
+
+    @OneToMany(
+            mappedBy = "graph",
+            fetch = FetchType.LAZY
+    )
+    private List<GraphNode> nodes;
+
+    @OneToMany(
+            mappedBy = "graph",
+            fetch = FetchType.LAZY
+    )
+    private List<GraphEdge> edges;
 }

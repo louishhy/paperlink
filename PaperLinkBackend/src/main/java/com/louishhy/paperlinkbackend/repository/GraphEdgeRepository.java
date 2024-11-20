@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface GraphEdgeRepository extends JpaRepository<GraphEdge, Long> {
     List<GraphEdge> findByGraphId(long graphId);
+
+    boolean existsByGraphIdAndCitingPaperIdAndCitedPaperId(long graphId, long citingPaperId, long citedPaperId);
 }

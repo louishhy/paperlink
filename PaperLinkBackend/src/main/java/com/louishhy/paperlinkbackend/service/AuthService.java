@@ -1,5 +1,6 @@
 package com.louishhy.paperlinkbackend.service;
 
+import com.louishhy.paperlinkbackend.dto.user.AuthenticationResult;
 import com.louishhy.paperlinkbackend.dto.user.JwtResponse;
 import com.louishhy.paperlinkbackend.dto.user.LoginRequest;
 import com.louishhy.paperlinkbackend.dto.user.RegisterRequest;
@@ -7,12 +8,15 @@ import com.louishhy.paperlinkbackend.model.Account;
 import com.louishhy.paperlinkbackend.repository.AccountRepository;
 import com.louishhy.paperlinkbackend.security.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,8 @@ public class AuthService {
     private final CustomUserDetailService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
+    @Value("${jwt.expiration}")
+    private long jwtExpiration;
 
     @Autowired
     public AuthService(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, CustomUserDetailService userDetailsService, PasswordEncoder passwordEncoder, AccountRepository accountRepository) {
@@ -36,7 +42,7 @@ public class AuthService {
         this.accountRepository = accountRepository;
     }
 
-    public ResponseEntity<?> login(LoginRequest loginRequest) {
+    public AuthenticationResult login(LoginRequest loginRequest) {
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
@@ -47,10 +53,17 @@ public class AuthService {
                     new HashMap<>(),
                     userDetails.getUsername()
             );
+            return AuthenticationResult.builder()
+                    .success(true)
+                    .token(token)
+                    .username(userDetails.getUsername())
+                    .expiresIn(jwtExpiration)
+                    .build();
 
-            return ResponseEntity.ok(new JwtResponse(token));
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return AuthenticationResult.builder()
+                    .success(false)
+                    .build();
         }
     }
 
