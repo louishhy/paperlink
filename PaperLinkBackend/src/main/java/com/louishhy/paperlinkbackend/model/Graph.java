@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,11 +39,11 @@ public class Graph {
             mappedBy = "graph",
             fetch = FetchType.LAZY
     )
-    private List<GraphNode> nodes;
+    private List<GraphNode> nodes = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "graph",
             fetch = FetchType.LAZY
     )
-    private List<GraphEdge> edges;
+    private List<GraphEdge> edges = new ArrayList<>();
 }

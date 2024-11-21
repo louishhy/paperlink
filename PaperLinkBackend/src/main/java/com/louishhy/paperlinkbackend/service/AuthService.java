@@ -20,10 +20,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 
 @Service
+@Transactional(readOnly = true)
 public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
@@ -67,6 +69,7 @@ public class AuthService {
         }
     }
 
+    @Transactional
     public ResponseEntity<?> register(RegisterRequest registerRequest) {
         if (accountRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body("Username already exists");

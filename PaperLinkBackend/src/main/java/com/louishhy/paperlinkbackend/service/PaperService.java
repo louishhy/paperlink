@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class PaperService {
     private final PaperRepository paperRepository;
     private final CrossrefClient crossrefClient;
@@ -37,6 +38,7 @@ public class PaperService {
         return paperRepository.findAll();
     }
 
+    @Transactional
     public Paper addPaperByDoi(String doi) {
         CrossrefWork crossrefWork = this.crossrefClient.getWorkByDoi(doi);
         Paper paper = new Paper();

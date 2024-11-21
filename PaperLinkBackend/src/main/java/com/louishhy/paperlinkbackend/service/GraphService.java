@@ -16,38 +16,52 @@ import com.louishhy.paperlinkbackend.repository.GraphNodeRepository;
 import com.louishhy.paperlinkbackend.repository.GraphRepository;
 import com.louishhy.paperlinkbackend.repository.PaperRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class GraphService {
     private final GraphRepository graphRepository;
     private final GraphEdgeRepository graphEdgeRepository;
     private final GraphNodeRepository graphNodeRepository;
     private final PaperRepository paperRepository;
+    private final CustomUserDetailService userDetailsService;
 
     @Autowired
     public GraphService(GraphRepository graphRepository,
                         GraphEdgeRepository graphEdgeRepository,
-                        GraphNodeRepository graphNodeRepository, PaperRepository paperRepository) {
+                        GraphNodeRepository graphNodeRepository,
+                        PaperRepository paperRepository, CustomUserDetailService userDetailsService) {
         this.graphRepository = graphRepository;
         this.graphEdgeRepository = graphEdgeRepository;
         this.graphNodeRepository = graphNodeRepository;
         this.paperRepository = paperRepository;
+        this.userDetailsService = userDetailsService;
     }
 
+    @Transactional
     public GraphDTO createGraph(CreateGraphRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        // Get user id
+        Long userId = userDetailsService.getUserId(username);
         Graph graph = new Graph();
         graph.setName(request.getGraphName());
         graph.setDescription(request.getGraphDescription());
-        graph.setUserId(request.getUserId());
+        graph.setUserId(userId);
         Graph savedGraph = graphRepository.save(graph);
         return GraphDTO.fromEntity(savedGraph);
     }
 
+    @Transactional
     public void deleteGraph(DeleteGraphRequest request) {
         Graph graph = graphRepository.findById(request.getGraphId())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Graph with id %d not found", request.getGraphId())));
@@ -81,6 +95,7 @@ public class GraphService {
                 .toList();
     }
 
+    @Transactional
     public GraphNodeDTO addGraphNode(GraphAddNodeRequest request) {
         Graph graph = graphRepository.findById(request.getGraphId())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Graph with id %d not found", request.getGraphId())));
@@ -102,6 +117,7 @@ public class GraphService {
         return GraphNodeDTO.fromEntity(savedGraphNode);
     }
 
+    @Transactional
     public GraphEdgeDTO addGraphEdge(GraphAddEdgeRequest request) {
         Graph graph = graphRepository.findById(request.getGraphId())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Graph with id %d not found", request.getGraphId())));
@@ -126,12 +142,14 @@ public class GraphService {
         return GraphEdgeDTO.fromEntity(savedGraphEdge);
     }
 
+    @Transactional
     public void deleteGraphNode(GraphDeleteNodeRequest request) {
         GraphNode graphNode = graphNodeRepository.findById(request.getNodeId())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Node with id %d not found", request.getNodeId())));
         graphNodeRepository.delete(graphNode);
     }
 
+    @Transactional
     public void deleteGraphEdge(GraphDeleteEdgeRequest request) {
         GraphEdge graphEdge = graphEdgeRepository.findById(request.getEdgeId())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Edge with id %d not found", request.getEdgeId())));

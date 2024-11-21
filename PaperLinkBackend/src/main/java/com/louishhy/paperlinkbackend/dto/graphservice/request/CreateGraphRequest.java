@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class CreateGraphRequest {
-    private Long userId;
     private String graphName;
     private String graphDescription;
 }
