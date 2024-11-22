@@ -13,16 +13,30 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-        info = @Info(title = "Paperlink API", version = "v1"),
-        security = @SecurityRequirement(name = "bearerAuth")
+        info = @Info(
+                title = "Paperlink API",
+                version = "v1"
+        ),
+        security = {
+                @SecurityRequirement(name = "cookieAuth")
+        }
 )
 @SecurityScheme(
-        name = "bearerAuth",
-        type = SecuritySchemeType.HTTP,
-        scheme = "bearer",
-        bearerFormat = "JWT",
-        in = SecuritySchemeIn.HEADER
+        name = "cookieAuth",
+        type = SecuritySchemeType.APIKEY,
+        in = SecuritySchemeIn.COOKIE,
+        paramName = "paperlink-token"
 )
 public class OpenApiConfig {
-}
 
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(new Components()
+                        .addSecuritySchemes("cookieAuth",
+                                new io.swagger.v3.oas.models.security.SecurityScheme()
+                                        .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.APIKEY)
+                                        .in(io.swagger.v3.oas.models.security.SecurityScheme.In.COOKIE)
+                                        .name("paperlink-token")));
+    }
+}

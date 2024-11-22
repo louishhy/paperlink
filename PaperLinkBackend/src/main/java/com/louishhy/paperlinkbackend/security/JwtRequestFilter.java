@@ -3,6 +3,7 @@ package com.louishhy.paperlinkbackend.security;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -43,14 +44,25 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String authorizationHeader = request.getHeader("Authorization");
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                logger.info("Cookie: " + cookie.getName() + "=" + cookie.getValue());
+            }
+        }
+        String jwt = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("paperlink-token")) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
 
         String username = null;
-        String jwt = null;
-
-        // Extract token from auth header
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
+        if (jwt != null) {
             try {
                 username = jwtTokenUtil.getUserNameFromToken(jwt);
             } catch (IllegalArgumentException e) {
