@@ -7,6 +7,7 @@ import com.louishhy.paperlinkbackend.dto.user.RegisterRequest;
 import com.louishhy.paperlinkbackend.model.Account;
 import com.louishhy.paperlinkbackend.repository.AccountRepository;
 import com.louishhy.paperlinkbackend.security.JwtTokenUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import java.util.HashMap;
 
 @Service
 @Transactional(readOnly = true)
+@Slf4j
 public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
@@ -67,6 +70,16 @@ public class AuthService {
                     .success(false)
                     .build();
         }
+    }
+
+    // Use for checking the user's login status with valid JWT
+    public ResponseEntity<?> checkLoginStatus() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // If anonymous user, return 401
+        if (auth == null || auth.getPrincipal().equals("anonymousUser")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok().build();
     }
 
     @Transactional

@@ -37,19 +37,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        // Do not filter if request is to /api/auth/**
-        if (request.getRequestURI().startsWith("/api/auth/")) {
-            logger.info("Skipping JWT filter for /api/auth/**");
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        // Do not filter if request is to /api/auth/**
+//        if (request.getRequestURI().startsWith("/api/auth/")) {
+//            logger.info("Skipping JWT filter for /api/auth/**");
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                logger.info("Cookie: " + cookie.getName() + "=" + cookie.getValue());
-            }
-        }
         String jwt = null;
         if (cookies != null) {
             for (Cookie cookie : cookies) {
