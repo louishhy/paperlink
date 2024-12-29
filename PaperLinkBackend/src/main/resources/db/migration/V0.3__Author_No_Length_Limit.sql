@@ -1,0 +1,2 @@
+ALTER TABLE paper
+MODIFY authors TEXT NOT NULL;
