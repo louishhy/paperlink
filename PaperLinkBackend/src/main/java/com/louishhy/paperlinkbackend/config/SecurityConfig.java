@@ -64,7 +64,6 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(Arrays.asList(
                 "Authorization", "Content-Type", "X-Requested-With")
         );
-        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L); // 1 hour
 
