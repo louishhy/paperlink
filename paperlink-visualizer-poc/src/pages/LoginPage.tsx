@@ -1,10 +1,12 @@
-import * as process from "node:process";
 import {useState} from "react";
 import * as React from "react";
 import {useNavigate} from "react-router-dom";
+import {paperlinkLogin} from "@/services/authService.ts";
+import LoginAlertPanel from "@/components/LoginPage/LoginAlertPanel.tsx";
+import LoginFormInput from "@/components/LoginPage/LoginFormInput.tsx";
+import LoginHeader from "@/components/LoginPage/LoginHeader.tsx";
+import {Card} from "@/components/ui/card.tsx";
 
-const API_BASE_URL = process.env.API_BASE_URL;
-const LOGIN_API_PATH = process.env.LOGIN_API_PATH;
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -13,27 +15,15 @@ const LoginPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleLogin = async (e: React.FormEvent) => {
         // Default: Refresh and form added to the URL. Prevent it.
         e.preventDefault();
         setLoading(true);
         setError('');
 
         try {
-            const response = await fetch(`${API_BASE_URL}/${LOGIN_API_PATH}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username: username, password: password }),
-                credentials: 'include'
-            });
-
-            if (response.ok) {
-                navigate("/dashboard");
-            } else {
-                setError("Login failed.");
-            }
+            await paperlinkLogin(username, password);
+            navigate('/dashboard');
         } catch (error: unknown) {
             if (error instanceof Error) {
                 setError(error.message);
@@ -47,7 +37,19 @@ const LoginPage = () => {
 
     return (
         <div className="flex items-center justify-center min-h-screen">
-
+            <Card className="w-full max-w-md">
+                <LoginHeader />
+                <LoginFormInput
+                    handleLogin={handleLogin}
+                    username={username}
+                    setUsername={setUsername}
+                    password={password}
+                    setPassword={setPassword}
+                    loading={loading}
+                />
+                { error &&
+                    <LoginAlertPanel errorMessage={error} />}
+            </Card>
         </div>
     )
 };
