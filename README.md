@@ -17,3 +17,4 @@ By figuring out the "reference tree" of papers in your domain, you can better un
 
 ## 🔧 Components
 - **Backend** `PaperLinkBackend/`: Java / Spring based backend and database.
+- **Visualizer POC** `paperlink-visualizer-poc`: React / Typescript / D3.js PoC for user system and visualizing connections.
