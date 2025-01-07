@@ -16,5 +16,6 @@ By figuring out the "reference tree" of papers in your domain, you can better un
 - **Note**: Add your thoughts to the papers.
 
 ## 🔧 Components
-- **Backend** `PaperLinkBackend/`: Java / Spring based backend and database.
+- **Java Backend** `PaperLinkBackend/`: Java / Spring based backend and database.
+- **Cloudflare Cloud Backend** `paperlink-backend-cloudflare/`: Typescript / Hono version backend for Cloudflare edge computing stack.
 - **Visualizer POC** `paperlink-visualizer-poc`: React / Typescript / D3.js PoC for user system and visualizing connections.
